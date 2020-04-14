@@ -51,22 +51,17 @@ Serial pc(USBTX, USBRX);
 
 int m_addr = FXOS8700CQ_SLAVE_ADDR1;
 EventQueue queue1(32 * EVENTS_EVENT_SIZE);
+InterruptIn sw2(SW2);
+DigitalOut redLED(LED1);
 
 Thread thread1;
-InterruptIn sw2(SW2);
-int tilt[100];
-DigitalOut redLED(LED1);
+
 
 
 void FXOS8700CQ_readRegs(int addr, uint8_t * data, int len);
 void FXOS8700CQ_writeRegs(uint8_t * data, int len);
 void logger();
-void led_tilt();
-void led_d();
-float record_x[100];
-float record_y[100];
-int k;
-int i;
+int i,tilt[100];
 float t[3];
 
 int main() {
@@ -129,19 +124,6 @@ int main() {
 
       t[2] = ((float)acc16) / 4096.0f;
 
-
-      /*printf("FXOS8700Q ACC: X=%1.4f(%x%x) Y=%1.4f(%x%x) Z=%1.4f(%x%x)\r\n",\
-
-            t[0], res[0], res[1],\
-
-            t[1], res[2], res[3],\
-
-            t[2], res[4], res[5]\
-
-      );*/
-      /*redLED=1;
-      record_x[i]=t[0];
-      record_y[i]=t[1];*/
       thread1.start(callback(&queue1, &EventQueue::dispatch_forever));
 
       sw2.rise(queue1.event(logger));
@@ -165,25 +147,18 @@ void FXOS8700CQ_writeRegs(uint8_t * data, int len) {
 
 }
 void logger(){
-    /*for(k=0;k<50;k++){
-        pc.printf("%f\n",record_x[k]);
-        if((record_x[i]>0.5) || (record_x[i]<-0.5) || (record_y[i]>0.5) || (record_y[i]<-0.5)){
-           tilt[i]=1;
-           redLED=0;
-        }
-        else{
-           tilt[i]=0;
-           redLED=1;
-        }
-        pc.printf("%d\n",tilt[i]);
-    }*/
-   for(i=0;i<10;i++){
-      if((t[0]>0.5) || (t[0]<-0.5) || (t[1]>0.5) || (t[1]<-0.5)){
+   for(i=0; i<10; i++){
+      if (t[0]>0.5 || t[0]<-0.5 || t[1]>0.5 || t[1]<-0.5){
+      //pc.printf("%f\n",t[1]);
          tilt[i]=1;
+         redLED=0;
       }
       else{
          tilt[i]=0;
+         redLED=1;
       }
+      pc.printf("%d\n",tilt[i]);
+      wait(0.1);
    }
-   pc.printf("%d\n",tilt[i]);
+   redLED=1;
 }
