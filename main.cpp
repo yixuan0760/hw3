@@ -66,6 +66,8 @@ void led_d();
 float record_x[100];
 float record_y[100];
 int k;
+int i;
+float t[3];
 
 int main() {
    pc.baud(115200);
@@ -74,8 +76,6 @@ int main() {
    uint8_t who_am_i, data[2], res[6];
 
    int16_t acc16;
-   int i;
-   float t[3];
 
    
    // Enable the FXOS8700Q
@@ -97,7 +97,7 @@ int main() {
 
    //pc.printf("Here is %x\r\n", who_am_i);
 
-   for(i=0; i<50; i++){
+   while(true){
 
 
       FXOS8700CQ_readRegs(FXOS8700Q_OUT_X_MSB, res, 6);
@@ -139,18 +139,13 @@ int main() {
             t[2], res[4], res[5]\
 
       );*/
-      redLED=1;
+      /*redLED=1;
       record_x[i]=t[0];
-      record_y[i]=t[1];
+      record_y[i]=t[1];*/
       thread1.start(callback(&queue1, &EventQueue::dispatch_forever));
-
-      // 'led1_thread' will execute in context of thread 'thread1'
 
       sw2.rise(queue1.event(logger));
 
-      // 'led2_thread' will execute in context of thread 'thread2'
-
-      redLED=1;
       wait(0.1);
 
    }
@@ -170,22 +165,25 @@ void FXOS8700CQ_writeRegs(uint8_t * data, int len) {
 
 }
 void logger(){
-    for(k=0;k<50;k++){
-        //pc.printf("%f\n",record_x[k]);
-        if((record_x[k]>0.5) || (record_x[k]<-0.5) || (record_y[k]>0.5) || (record_y[k]<-0.5)){
-           tilt[k]=1;
-           queue1.call(led_tilt);
+    /*for(k=0;k<50;k++){
+        pc.printf("%f\n",record_x[k]);
+        if((record_x[i]>0.5) || (record_x[i]<-0.5) || (record_y[i]>0.5) || (record_y[i]<-0.5)){
+           tilt[i]=1;
+           redLED=0;
         }
         else{
-           tilt[k]=0;
-           queue1.call(led_d);
+           tilt[i]=0;
+           redLED=1;
         }
-        pc.printf("%d\n",tilt[k]);
-    }
-}
-void led_tilt(){
-   redLED =0;
-}
-void led_d(){
-   redLED =1;
+        pc.printf("%d\n",tilt[i]);
+    }*/
+   for(i=0;i<10;i++){
+      if((t[0]>0.5) || (t[0]<-0.5) || (t[1]>0.5) || (t[1]<-0.5)){
+         tilt[i]=1;
+      }
+      else{
+         tilt[i]=0;
+      }
+   }
+   pc.printf("%d\n",tilt[i]);
 }
