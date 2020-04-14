@@ -62,9 +62,10 @@ void FXOS8700CQ_readRegs(int addr, uint8_t * data, int len);
 void FXOS8700CQ_writeRegs(uint8_t * data, int len);
 void logger();
 int i,tilt[100];
-float t[3];
+float t[3],x_val[100],y_val[100],z_val[100];
 
 int main() {
+   redLED=1;
    pc.baud(115200);
 
 
@@ -147,7 +148,7 @@ void FXOS8700CQ_writeRegs(uint8_t * data, int len) {
 
 }
 void logger(){
-   for(i=0; i<10; i++){
+   for(i=0; i<100; i++){
       if (t[0]>0.5 || t[0]<-0.5 || t[1]>0.5 || t[1]<-0.5){
       //pc.printf("%f\n",t[1]);
          tilt[i]=1;
@@ -158,7 +159,19 @@ void logger(){
          redLED=1;
       }
       pc.printf("%d\n",tilt[i]);
+      x_val[i]=t[0];
+      y_val[i]=t[1];
+      z_val[i]=t[2];
       wait(0.1);
    }
    redLED=1;
+   for(i=0; i<100; i++){
+      pc.printf("%1.4f\n",x_val[i]);
+   }
+   for(i=0; i<100; i++){
+      pc.printf("%1.4f\n",y_val[i]);
+   }
+   for(i=0; i<100; i++){
+      pc.printf("%1.4f\n",z_val[i]);
+   }
 }
