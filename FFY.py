@@ -63,19 +63,19 @@ for a in range(300,400):
 
 
 fig, ax = plt.subplots(2, 1)
-ax[0].plot(t,x)
-ax[0].plot(t,y)
-ax[0].plot(t,z)
+ax[0].plot(t,x,label='x')
+ax[0].plot(t,y,label='y')
+ax[0].plot(t,z,label='z')
 ax[0].set_xlabel('Time')
 
 ax[0].set_ylabel('Acc Vector' )
 
-ax[1].stem(t,tilt) # plotting the spectrum
+ax[1].stem(t,tilt,use_line_collection=True) # plotting the spectrum
 
 ax[1].set_xlabel('Time')
 
 ax[1].set_ylabel('Tilt')
-
+ax[0].legend()
 plt.show()
 
 s.close()
